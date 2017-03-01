@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/01 08:45:46 by lweinste          #+#    #+#             */
-/*   Updated: 2017/03/01 09:48:41 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/01 12:03:10 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,6 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <stdio.h>
-
-
-
-
 
 typedef struct s_longform	t_longform;
 struct						s_longform{
