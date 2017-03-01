@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/07 18:08:01 by lweinste          #+#    #+#             */
-/*   Updated: 2017/02/28 23:45:49 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/01 00:18:25 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,15 @@ void	print_items(t_contents *contents)
 	print_items(contents->next);
 }
 
+void	print_visible(t_contents *contents)
+{
+	if (contents == NULL)
+		return ;
+	if (*contents->name != '.')
+		ft_putstr_nl(contents->name);
+	print_visible(contents->next);
+}
+
 t_ls	*noname_ls(void)
 {
 	t_ls *output;
@@ -184,25 +193,21 @@ t_ls	*single(char *above, char *name)
 	struct	stat item;
 
 	output = noname_ls();
-	if (above == NULL)
-		output->cur = ft_strdup(name);
-	else
-	{
-		tmp = ft_strjoin(above, "/");
-		output->cur = ft_strjoin(tmp, name);
-		free(tmp);
-	}
+	tmp = (above == NULL) ? NULL : ft_strjoin(above, "/");
+	output->cur = ft_strjoin(tmp, name);
 	if ((output->open = opendir(output->cur)) == NULL)
 		return(NULL);
 	while((output->ent = readdir(output->open)) != NULL)
 	{
 		ft_memset(&item, 0, sizeof(struct stat));
-		stat(output->cur, &item);
+		stat(ft_strjoin(ft_strjoin(output->cur, "/"), output->ent->d_name), &item);
 		if (S_ISDIR(item.st_mode) && ft_strcmp(output->ent->d_name, ".") != 0
 				&& ft_strcmp(output->ent->d_name, "..") != 0)
 			ls_add_item(&output->dirs, new_item(output->ent));
 		ls_add_item(&output->items, new_item(output->ent));
 	}
+	if (tmp != NULL)
+		free(tmp);
 	return (output);
 }
 
@@ -228,8 +233,10 @@ int		main(int argc, char **argv)
 		ls = single(NULL, argv[1]);
 	if (ls == NULL)
 		perror("ls: ");
-	//sort_contents(&ls->dirs);
 	else
-		print_items(ls->dirs);
+	{
+		sort_contents(&ls->dirs);
+		print_visible(ls->dirs);
+	}
 	return (0);
 }
