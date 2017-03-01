@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/07 18:08:01 by lweinste          #+#    #+#             */
-/*   Updated: 2017/02/28 22:38:30 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/02/28 23:45:49 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,48 @@ void	print_items(t_contents *contents)
 	ft_putstr_nl(contents->name);
 	print_items(contents->next);
 }
+
+t_ls	*noname_ls(void)
+{
+	t_ls *output;
+
+	output = (t_ls*)malloc(sizeof(t_ls));
+	output->items = NULL;
+	output->dirs = NULL;
+	output->next = NULL;
+	return (output);
+}
+
+t_ls	*single(char *above, char *name)
+{
+	t_ls *output;
+	char	*tmp;
+	struct	stat item;
+
+	output = noname_ls();
+	if (above == NULL)
+		output->cur = ft_strdup(name);
+	else
+	{
+		tmp = ft_strjoin(above, "/");
+		output->cur = ft_strjoin(tmp, name);
+		free(tmp);
+	}
+	if ((output->open = opendir(output->cur)) == NULL)
+		return(NULL);
+	while((output->ent = readdir(output->open)) != NULL)
+	{
+		ft_memset(&item, 0, sizeof(struct stat));
+		stat(output->cur, &item);
+		if (S_ISDIR(item.st_mode) && ft_strcmp(output->ent->d_name, ".") != 0
+				&& ft_strcmp(output->ent->d_name, "..") != 0)
+			ls_add_item(&output->dirs, new_item(output->ent));
+		ls_add_item(&output->items, new_item(output->ent));
+	}
+	return (output);
+}
+
+
 int		main(int argc, char **argv)
 {
 	char *str;
@@ -177,23 +219,17 @@ int		main(int argc, char **argv)
 	ls->items = NULL;
 	ls->dirs = NULL;
 	ls->next = NULL;
+	errno = 0;
 	if (argc < 2)
-		ls->cur = ft_strdup(".");
+		ls = single(NULL, ".");
+	else if (argv[1][0] != '/' && argv[1][0] != '~')
+		ls = single(".", ft_strdup(argv[1]));
 	else
-		ls->cur = ft_strdup(argv[1]);
-	if ((ls->open = opendir(ls->cur)) == NULL)
-		return (-1);
-	while ((ls->ent = readdir(ls->open)) != NULL)
-	{
-		lstat(ls->ent->d_name, &item);
-		if (S_ISDIR(item.st_mode) && ft_strcmp(ls->ent->d_name, ".") != 0
-				&& ft_strcmp(ls->ent->d_name, "..") != 0)
-			ls_add_item(&ls->dirs, new_item(ls->ent)); 
-		ls_add_item(&ls->items, new_item(ls->ent));
-		//print_items(ls->items);
-		//ft_putstr_nl(cur->d_name);
-	}
-	sort_contents(&ls->dirs);
-	print_items(ls->dirs);
+		ls = single(NULL, argv[1]);
+	if (ls == NULL)
+		perror("ls: ");
+	//sort_contents(&ls->dirs);
+	else
+		print_items(ls->dirs);
 	return (0);
 }
