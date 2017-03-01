@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/07 18:08:01 by lweinste          #+#    #+#             */
-/*   Updated: 2017/03/01 10:28:42 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/01 13:55:35 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,14 +250,14 @@ int		main(int argc, char **argv)
 		ls = single(NULL, argv[1]);
 	if (ls == NULL)
 		perror("ls: ");
-	else if (ls->dirs != NULL) //if (ls->dirs != NULL) or (ls->items != NULL) is critical in the
+	else if (ls->items != NULL) //if (ls->dirs != NULL) or (ls->items != NULL) is critical in the
 	{							//situation of an empty directory.
-		sort_contents(&ls->dirs);
-		ls->dirs->details = get_details(ls, *ls->dirs);
+		sort_contents(&ls->items);
+		ls->items->details = get_details(ls, *ls->items);
 		//if (ls->dirs->details == NULL)
 		//	ft_putstr("ANUS");
 		//print_named(ls->dirs);
-		print_long(ls, ls->dirs, ls->dirs);
+		print_long(ls, ls->items, ls->items);
 	}
 	return (0);
 }
