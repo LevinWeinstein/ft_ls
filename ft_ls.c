@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/07 18:08:01 by lweinste          #+#    #+#             */
-/*   Updated: 2017/03/01 00:18:25 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/01 10:18:32 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void	swap_contents(t_contents *one, t_contents *two)
 {
 	char			*name;
 	struct stat		*stats;
-	t_longform		details;
+	t_longform		*details;
 
 	details = one->details;
 	name = one->name;
@@ -143,17 +143,22 @@ void	ls_add_item(t_contents **ls, t_contents *add)
 		ls_add_item(&(*ls)->next, add);
 }
 
-t_contents *new_item(struct dirent *ent)
+t_contents *new_item(t_ls *ls, struct dirent *ent)
 {
 	t_contents *output;
 	struct stat	tmp;
+	char		*tmp1;
+	char		*tmp2;
 
+	tmp1 = ft_strjoin(ls->cur, "/");
 	output = (t_contents*)malloc(sizeof(t_contents));
 	output->stats = (struct stat*)malloc(sizeof(struct stat));
 	output->name = ft_strdup(ent->d_name);
-	lstat(ent->d_name, &tmp);
+	//output->name = ent->d_name;
+	tmp2 = ft_strjoin(tmp1, ent->d_name);
+	lstat(tmp2, &tmp);
 	*output->stats = tmp;
-	//output->details = NULL; //replace with get_longform
+	output->details = get_details(ls, *output); //replace with get_longform
 	output->next = NULL;
 	return (output);
 }
@@ -171,6 +176,16 @@ void	print_visible(t_contents *contents)
 	if (contents == NULL)
 		return ;
 	if (*contents->name != '.')
+		ft_putstr_nl(contents->name);
+	print_visible(contents->next);
+}
+
+void	print_named(t_contents *contents)
+{
+	if (contents == NULL)
+		return ;
+	if (ft_strcmp(contents->name, ".") != 0 &&
+			ft_strcmp(contents->name, "..") != 0)
 		ft_putstr_nl(contents->name);
 	print_visible(contents->next);
 }
@@ -193,6 +208,8 @@ t_ls	*single(char *above, char *name)
 	struct	stat item;
 
 	output = noname_ls();
+	output->dirs = NULL;
+	output->items = NULL;
 	tmp = (above == NULL) ? NULL : ft_strjoin(above, "/");
 	output->cur = ft_strjoin(tmp, name);
 	if ((output->open = opendir(output->cur)) == NULL)
@@ -203,8 +220,8 @@ t_ls	*single(char *above, char *name)
 		stat(ft_strjoin(ft_strjoin(output->cur, "/"), output->ent->d_name), &item);
 		if (S_ISDIR(item.st_mode) && ft_strcmp(output->ent->d_name, ".") != 0
 				&& ft_strcmp(output->ent->d_name, "..") != 0)
-			ls_add_item(&output->dirs, new_item(output->ent));
-		ls_add_item(&output->items, new_item(output->ent));
+			ls_add_item(&output->dirs, new_item(output, output->ent));
+		ls_add_item(&output->items, new_item(output, output->ent));
 	}
 	if (tmp != NULL)
 		free(tmp);
@@ -228,15 +245,19 @@ int		main(int argc, char **argv)
 	if (argc < 2)
 		ls = single(NULL, ".");
 	else if (argv[1][0] != '/' && argv[1][0] != '~')
-		ls = single(".", ft_strdup(argv[1]));
+		ls = single(NULL, ft_strdup(argv[1]));
 	else
 		ls = single(NULL, argv[1]);
 	if (ls == NULL)
 		perror("ls: ");
-	else
-	{
+	else if (ls->dirs != NULL) //if (ls->dirs != NULL) or (ls->items != NULL) is critical in the
+	{							//situation of an empty directory.
 		sort_contents(&ls->dirs);
-		print_visible(ls->dirs);
+		ls->dirs->details = get_details(ls, *ls->dirs);
+		//if (ls->dirs->details == NULL)
+		//	ft_putstr("ANUS");
+		//print_named(ls->dirs);
+		print_long(ls, ls->dirs, ls->dirs);
 	}
 	return (0);
 }
