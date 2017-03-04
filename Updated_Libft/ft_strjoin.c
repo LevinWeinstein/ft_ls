@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/09/27 01:20:22 by lweinste          #+#    #+#             */
-/*   Updated: 2016/09/27 01:48:32 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/02 23:47:43 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (s1 == NULL && s2 == NULL)
 		return (NULL);
 	if (s1 == NULL)
-		return ((char *)s2);
+		return ((char *)ft_strdup(s2));
 	if (s2 == NULL)
-		return ((char *)s1);
+		return ((char *)ft_strdup(s1));
 	len = ft_strlen(s1) + ft_strlen(s2) + 1;
 	if ((output = ft_strnew(len)) == NULL)
 		return (NULL);

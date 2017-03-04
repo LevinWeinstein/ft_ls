@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/01 02:52:33 by lweinste          #+#    #+#             */
-/*   Updated: 2017/03/01 10:28:23 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/03 03:19:25 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,10 +148,9 @@ t_longform *get_details(t_ls *home, t_contents contents)
 	tmp1 = ft_strjoin(home->cur, "/");
 	tmp2 = ft_strjoin(tmp1, contents.name);
 	free(tmp1);
-	//ft_putstr(tmp2);
-	//ft_putstr("\n\n");
 	if (lstat(tmp2, &test) == -1)
 		return (NULL);
+	//home->total += test.st_blocks;
 	output = (t_longform*)malloc(sizeof(t_longform));
 	output->mode = get_mode(contents);
 	output->links = count_links(contents);
@@ -264,17 +263,21 @@ size_t	byte_digits(const t_contents *set)
 
 void	check_link(t_ls *home, t_contents check)
 {
-	char	*temp;
-	char	*linked_to;
+	char	linked_from[PATH_MAX + 1];
+	char	linked_to[PATH_MAX + 1];
 
 	if ((S_ISLNK(check.stats->st_mode)))
 	{
-		temp = ft_strjoin(home->cur, check.name);
-		linked_to = ft_strnew(PATH_MAX);
-		readlink(check.name, linked_to, PATH_MAX - 1);
+		ft_bzero(linked_to, PATH_MAX + 1);
+		ft_bzero(linked_from, PATH_MAX + 1);
+		combine_path(linked_from, home->cur, check.name);
+		//temp = ft_strjoin(home->cur, "/");
+		//temp2 = ft_strjoin(temp, check.name);
+		//free(temp);
+		readlink(linked_from, linked_to, PATH_MAX + 1);
 		ft_putstr(" -> ");
 		ft_putstr(linked_to);
-		ft_strdel(&linked_to);
+		//free(temp2);
 	}
 	ft_putchar('\n');
 }
@@ -297,6 +300,19 @@ void	ft_numspace(int n)
 	ft_putchar(' ');
 }
 
+/*
+** To migrate to w, replace putprint in names to putstr
+*/
+void	ft_putprint(const char *str)
+{
+	int	i;
+	char c;
+
+	i = -1;
+	while((c = str[++i]) != '\0')
+		ft_putchar(ft_isprint(c) > 0 ? c : '?');
+}
+
 void	grab_name(t_ls *home, t_contents *contents)
 {
 	size_t	i;
@@ -312,8 +328,26 @@ void	grab_name(t_ls *home, t_contents *contents)
 		i--;
 	j -= i - 1;
 	str = ft_strndup(contents->name + i, j);
-	ft_putstr(str);
+	ft_putprint(str);
 	ft_strdel(&str);
+}
+
+void	ok_putnbr(intmax_t n)
+{
+	int	negative;
+
+	if((negative = (n < 0 ? -1 : 1)) == -1)
+		ft_putchar('-');
+	if (n > 10 || n < -10)
+		ok_putnbr((n / 10) * negative);
+	ft_putchar('0' + ((n % 10) * negative));
+}
+
+void	print_total(long long blocks)
+{
+	ft_putstr("total ");
+	ok_putnbr(blocks);
+	ft_putchar('\n');
 }
 
 void	print_long(t_ls *home, t_contents *safe, t_contents *set)
@@ -326,16 +360,13 @@ void	print_long(t_ls *home, t_contents *safe, t_contents *set)
 	ft_charstr(set->details->mode, set->details->rights);
 	while(i++ <= 1 + (link_digits(safe) - get_digits(set->details->links)))
 		ft_putchar(' ');
-	ft_putnbr((int)set->details->links);
-	i = 0;
+	ft_putnbr((i = 0) < 2 ? (int)set->details->links: 0);
 	while(i++ <= longest_user(safe) - ft_strlen(set->details->user))
 		ft_putchar(' ');
-	ft_putstr(set->details->user);
-	i = 0;
+	ft_putstr((i = 0) < 2 ? set->details->user : "?\0");
 	while(i++ <= 1 + longest_group(safe) - ft_strlen(set->details->group))
 		ft_putchar(' ');
-	ft_putstr(set->details->group);
-	i = 0;
+	ft_putstr((i = 0) < 1 ? set->details->group : "?\0");
 	while(i++ <= 1 + byte_digits(safe) - get_digits(set->details->bytes))
 		ft_putchar(' ');
 	ft_numspace(set->details->bytes);

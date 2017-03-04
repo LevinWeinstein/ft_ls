@@ -6,7 +6,7 @@
 /*   By: lweinste <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/01 08:45:46 by lweinste          #+#    #+#             */
-/*   Updated: 2017/03/01 12:03:10 by lweinste         ###   ########.fr       */
+/*   Updated: 2017/03/03 06:31:09 by lweinste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,16 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <stdio.h>
+
+# define CAT(a, ...) PRIMITIVE_CAT(a, __VA_ARGS__)
+# define PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
+
+# define UNUSEDRETURN 0
+# define ONLYFLAGS -42
+
+# ifndef STRINGIFY
+# define STRINGIFY(x)	#x
+# endif
 
 typedef struct s_longform	t_longform;
 struct						s_longform{
@@ -45,15 +55,40 @@ struct						s_contents{
 	struct s_contents		*next;
 };
 
+typedef struct s_ls_namelist t_ls_namelist;
+struct						s_ls_namelist{
+	char					name[PATH_MAX + 1];
+	t_ls_namelist			*next;
+};
+
 typedef struct s_ls			t_ls;
 struct						s_ls{
 	char					*cur;
 	DIR						*open;
 	struct dirent			*ent;
+	int						dcnt;
+	blkcnt_t				total;
+	struct stat				stats;
 	t_contents				*items;
 	t_contents				*dirs;
+	t_ls_namelist			*namelist;
 	t_ls					*next;
 };
+
+typedef struct s_ls_flags	t_ls_flags;
+struct						s_ls_flags{
+	int						aa;
+	int						rr;
+
+	int						a;
+	int						l;
+	int						r;
+	int						t;
+
+	int						one;
+};
+
+
 /*
 ** Longform Functions
 */
@@ -80,18 +115,21 @@ void						print_long(t_ls *home, t_contents *safe, t_contents *set);
 /*
 ** 		2. Normal Print Functions								
 */
-void						ft_putstr_nl(char *str);
+void						ft_putstr_nl(const char *str);
+void						ft_putprint(const char *str);
 void						name_error(char *filename);
 void						print_items(t_contents *contents);
 void						print_visible(t_contents *contents);
 void						print_named(t_contents *contents);
+void						print_total(long long blocks);
+void						combine_path(char *dst, char *left, char *right);
 
 /*
 ** 		3. _ls Functions												----II.3
 */
 
 t_ls						*noname_ls(void);
-t_ls						*single(char *above, char *name);
+t_ls						*single(t_ls_flags a, char *above, char *name);
 
 /*
 **  	4. _contents Functions											----II.4
@@ -99,8 +137,13 @@ t_ls						*single(char *above, char *name);
 t_contents					*new_link(char *str);//potentially unused;
 void						print_contents(t_ls *cur, t_contents *contents);
 void						swap_contents(t_contents *one, t_contents *two);
+
+
 void						sort_contents(t_contents **contents);
-void						revsort_contents(t_contents **contents);
+void						revsort_contents(t_contents **contents); //deprecated, revalpha
+void						time_sort(t_contents **contents);
+void						revtime_sort(t_contents **contents);
+
 t_contents					*new_item(t_ls *ls, struct dirent *ent);
 
 /*
