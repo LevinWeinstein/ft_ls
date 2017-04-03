@@ -452,6 +452,7 @@ int	ft_exit(const int code, const char *str)
 ** ENOENT, even though fts_open is not a file or directory. This is
 ** most likely due to fts_open returns an FTS*
 */
+
 int	empty_fts_error(char *argv)
 {
 	if (argv == NULL || ft_strlen(argv) == 0)
@@ -521,13 +522,14 @@ int		ls_namelist_recurse(t_ls_flags flags, t_ls_namelist *name)
 {
 	//int i;
 	t_ls_namelist *tmp;
+	
 	if (name == NULL)
 		return -1;
 	printf("%s:\n", name->name);
 	while (name != NULL && ft_strlen(name->name) > 0)
 	{
 		tmp = inner(flags, name->name);
-		if (flags.rr && flags.a)
+		if (flags.rr)
 			ls_namelist_recurse(flags, (inner(flags, name->name)));
 		name = name->next;
 	}
@@ -560,11 +562,6 @@ int	main(int argc, char **argv)
 		namelist = from_argv(i, argc, argv);
 	if (namelist != NULL)
 		ls_namelist_recurse(flags, namelist);
-	//if (empty_fts_error(argv[i]))
-	//		return (0);
-//	return(inner(flags, argv[i]) == NULL);
-
-//return((int)ft_strlen(argv[0]) + argc);
 	return (0);
 }
 
