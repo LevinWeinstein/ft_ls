@@ -28,10 +28,10 @@
 
 # define CAT(a, ...) PRIMITIVE_CAT(a, __VA_ARGS__)
 # define PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
-
 # define UNUSEDRETURN 0
 # define ONLYFLAGS -42
-
+# define PLS(ND) print_long_single(ND, ND)
+# define PL(HB, ND) print_long(HB, ND, ND)
 # ifndef STRINGIFY
 # define STRINGIFY(x)	#x
 # endif
@@ -84,7 +84,6 @@ struct						s_ls_flags{
 	int						l;
 	int						r;
 	int						t;
-
 	int						one;
 };
 
@@ -111,7 +110,7 @@ void						ft_putspace(char *str);
 void						ft_charstr(char c, char *str);
 void						ft_numspace(int n);
 void						print_long(t_ls *home, t_contents *safe, t_contents *set);
-
+void						print_long_single(t_contents *safe, t_contents *set);
 /*
 ** 		2. Normal Print Functions								
 */
@@ -123,7 +122,7 @@ void						print_visible(t_contents *contents);
 void						print_named(t_contents *contents);
 void						print_total(long long blocks);
 void						combine_path(char *dst, char *left, char *right);
-
+t_ls_namelist 				*clean_dots(t_ls_namelist *namelist, t_ls_flags flags);
 /*
 ** 		3. _ls Functions												----II.3
 */
@@ -134,10 +133,8 @@ t_ls						*single(t_ls_flags a, char *above, char *name);
 /*
 **  	4. _contents Functions											----II.4
 */
-t_contents					*new_link(char *str);//potentially unused;
 void						print_contents(t_ls *cur, t_contents *contents);
 void						swap_contents(t_contents *one, t_contents *two);
-
 
 void						sort_contents(t_contents **contents);
 void						revsort_contents(t_contents **contents); //deprecated, revalpha
@@ -148,14 +145,10 @@ t_contents					*new_item(t_ls *ls, struct dirent *ent);
 
 /*
 **		5.	Adding Functions which have confusing names so I explain which is which.
-** 				a. ls_add_back: add an individual link to the back of an LS struct
-*/
-void						ls_add_back(t_ls **ls, t_ls *add);
-/*
 ** 				b. ls_add_item: add an individual link to the back of a CONTENTS struct
 */
 void						ls_add_item(t_contents **ls, t_contents *add);
-
+t_longform 					*get_details_single(t_contents contents);
 
 # endif
 

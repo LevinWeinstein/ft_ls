@@ -40,9 +40,9 @@ $(OBJECTS): $(SRCFILES)
 
 clean: 	
 	@/bin/rm -f $(OBJECTS)
-	@echo "\x1b[96m\t[\x1b[33m\x1b[4mLibft\x1b[24m\x1b[21m\x1b[96m]:\x1b[21m\x1b[32mLibft: clean Complete."
+	@echo "\x1b[96m\t[\x1b[33m\x1b[4mLibft\x1b[24m\x1b[21m\x1b[96m]\x1b[21m\x1b[32m clean Complete."
 fclean: clean
 	@/bin/rm -f $(LIBNAME)
-	@echo "\x1b[96m\t[\x1b[33m\x1b[4mLibft\x1b[24m\x1b[21m\x1b[96m]:\x1b[21m\x1b[32mLibft: fclean Complete."
+	@echo "\x1b[96m\t[\x1b[33m\x1b[4mLibft\x1b[24m\x1b[21m\x1b[96m]\x1b[21m\x1b[32m fclean Complete."
 re:	fclean all
 .PHONY: clean fclean re all

@@ -282,6 +282,29 @@ void	check_link(t_ls *home, t_contents check)
 	ft_putchar('\n');
 }
 
+void	check_link_single(t_contents check)
+{
+	char	linked_from[PATH_MAX + 1];
+	char	linked_to[PATH_MAX + 1];
+
+	if ((S_ISLNK(check.stats->st_mode)))
+	{
+		ft_bzero(linked_to, PATH_MAX + 1);
+		ft_bzero(linked_from, PATH_MAX + 1);
+		if (check.name[0] != '/')
+			combine_path(linked_from, ".", check.name);
+		else
+			ft_strcpy(linked_from, check.name);
+		//temp = ft_strjoin(home->cur, "/");
+		//temp2 = ft_strjoin(temp, check.name);
+		//free(temp);
+		readlink(linked_from, linked_to, PATH_MAX + 1);
+		ft_putstr(" -> ");
+		ft_putstr(linked_to);
+		//free(temp2);
+	}
+	ft_putchar('\n');
+}
 void	ft_putspace(char *str)
 {
 	ft_putstr(str);
@@ -376,5 +399,46 @@ void	print_long(t_ls *home, t_contents *safe, t_contents *set)
 	print_long(home, safe, set->next);
 }
 
+t_longform *get_details_single(t_contents contents)
+{
+	t_longform	*output;
+	struct stat	test;
+
+	if (lstat(contents.name, &test) == -1)
+		return (NULL);
+	output = (t_longform*)malloc(sizeof(t_longform));
+	output->mode = get_mode(contents);
+	output->links = count_links(contents);
+	output->rights = get_rights(contents);
+	output->user = get_user(contents);
+	output->group = get_group(contents);
+	output->bytes = count_bytes(contents);
+	output->time = time_string(contents.stats->st_mtime);
+	return (output);
+}
+void	print_long_single(t_contents *safe, t_contents *set)
+{
+	size_t	i;
+	
+	i = 0;
+	if (set == NULL || set->details == NULL)
+		return ;
+	ft_charstr(set->details->mode, set->details->rights);
+	while(i++ <= 1 + (link_digits(safe) - get_digits(set->details->links)))
+		ft_putchar(' ');
+	ft_putnbr((i = 0) < 2 ? (int)set->details->links: 0);
+	while(i++ <= longest_user(safe) - ft_strlen(set->details->user))
+		ft_putchar(' ');
+	ft_putstr((i = 0) < 2 ? set->details->user : "?\0");
+	while(i++ <= 1 + longest_group(safe) - ft_strlen(set->details->group))
+		ft_putchar(' ');
+	ft_putstr((i = 0) < 1 ? set->details->group : "?\0");
+	while(i++ <= 1 + byte_digits(safe) - get_digits(set->details->bytes))
+		ft_putchar(' ');
+	ft_numspace(set->details->bytes);
+	ft_putspace(set->details->time);
+	ft_putstr(set->name);
+	check_link_single(*set);
+}
 
 

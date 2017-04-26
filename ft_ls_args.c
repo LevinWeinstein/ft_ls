@@ -13,7 +13,7 @@
 #include <ft_ls.h>
 #include <libft.h>
 
-
+#define LNR ls_namelist_recurse
 /*
 ** Free bonuses:
 ** -A is just -a without printing . and ..
