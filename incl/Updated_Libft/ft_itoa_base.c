@@ -25,12 +25,12 @@ static char		*str_zero(void)
 	return (output);
 }
 
-static long	abs_val(long n)
+static long		abs_val(long n)
 {
 	return (n >= 0 ? n : (n * -1));
 }
 
-static long	safe_abs_mod(long n, int base)
+static long		safe_abs_mod(long n, int base)
 {
 	int m;
 

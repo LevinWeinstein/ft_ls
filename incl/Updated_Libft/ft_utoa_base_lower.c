@@ -12,10 +12,10 @@
 
 #include "libft.h"
 
-static char		g_values[] = {'0', '1', '2', '3', '4', '5',
+static char				g_values[] = {'0', '1', '2', '3', '4', '5',
 	'6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-static char		*str_zero(void)
+static char				*str_zero(void)
 {
 	char *output;
 
@@ -33,7 +33,7 @@ static uintmax_t		safe_mod(uintmax_t n, int base)
 	return (m);
 }
 
-static int		get_digits(uintmax_t value, int base)
+static int				get_digits(uintmax_t value, int base)
 {
 	int i;
 
@@ -46,10 +46,10 @@ static int		get_digits(uintmax_t value, int base)
 	return (i);
 }
 
-char			*ft_utoa_base_lower(uintmax_t value, int base)
+char					*ft_utoa_base_lower(uintmax_t value, int base)
 {
-	int		digits;
-	char	*output;
+	int				digits;
+	char			*output;
 	uintmax_t		safemod;
 
 	if (base < 2 || base > 16)

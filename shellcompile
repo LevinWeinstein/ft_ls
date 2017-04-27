@@ -1,1 +1,0 @@
-gcc -Wall -Wextra -Werror ft_ls.c ft_ls_l.c -I . -I Updated_Libft -L Updated_Libft -lft
