@@ -14,7 +14,8 @@
 #include <libft.h>
 
 /*
-** ls shows ? when non-printable when inside a dir,
+** ls shows a question mark  when non-printable 
+** when inside a dir,
 ** but prints nothing in place of a non-printable
 ** while iterating through a dir.
 */
